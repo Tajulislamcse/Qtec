@@ -7,22 +7,11 @@
     <link rel="stylesheet" type="text/css" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css"/>
 </head>
 <body>
- <div class="container-fluid">
+   <div class="container-fluid">
     <div class="col-sm-12">
         <div class="card">
             <table border="0" cellpadding="5">
-                <tbody>
-                    <tr>
-                        <td>Minimum age:</td>
-                        <td>
-                            <input type="text" id="min" name="min">
-                        </td>
-                        <td>Maximum age:</td>
-                        <td>
-                            <input type="text" id="max" name="max">
-                        </td>
-                    </tr>
-                </tbody>
+ 
 
                 <!--keyword search-->
                 <input type="checkbox"  id="laravel" name="keyword" value="laravel">
@@ -48,19 +37,50 @@
                 @php
                 $yesterday = new DateTime('yesterday'); 
                 $yesterday = $yesterday->format('d-m-Y');
-                $date = date('Y-m-d'-(7));
-                $sql = DB::select("SELECT * FROM table WHERE date <='$date' ");
-                dd($sql)
-                 @endphp
-                <br>
-                <br>
+                $lastweek = DB::select("SELECT date FROM searches
+                       WHERE YEARWEEK(date) = YEARWEEK(NOW() - INTERVAL 1 WEEK)");
+                $dates = [];
+                foreach($lastweek as $data)
+                {
+                   $dates[] = date('d-m-Y',strtotime($data->date));
+                }
+                $min_date = min($dates);
+                $max_date = max($dates);
 
+
+                @endphp
+                <br>
+                <br>
+               
                 <input type="checkbox"  name="keyword" value="{{$yesterday}}">
                 <label class="custom-control-label" for="yesterday">Yesterday</label>
-                <input type="checkbox"  name="keyword" value="">
+                <input type="checkbox" id="lastweek" name="keyword" value ="{{$min_date.'~'.$max_date}}">
+                <!-- <label class="custom-control-label" for="rakib">Last Week</label> -->
+
                 <label class="custom-control-label" for="rakib">Last Week</label>
-                <input type="checkbox" id="harun" name="keyword" value="harun">
-                <label class="custom-control-label" for="harun">harun</label>
+                &nbsp;
+                <input type="checkbox"  name="keyword" value="">
+
+                <label class="custom-control-label" for="rakib">Last Month</label>
+                <br>
+                <label class="custom-control-label">Min Date</label>
+                <input type="text" id="min" name="min">
+                <br>
+                <br>
+                <label class="custom-control-label">Max Date</label>
+
+                <input type="text" id="max" name="max">
+
+        
+
+    <!--                <tr>
+                    <td>Minimum date:</td>
+                    <td><input type="text" id="min" name="min"></td>
+                </tr>
+                <tr>
+                    <td>Maximum date:</td>
+                    <td><input type="text" id="max" name="max"></td>
+                </tr> -->
                 <!--/date search-->
                 <h1 class="records_count"></h1>
 
@@ -104,70 +124,74 @@
 <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.3.min.js"></script>
 <script src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.10.4/jquery.dataTables.min.js"></script>
 <script type="text/javascript">
-   $(document).ready(function () {
+ 
+
+  // function sendDates(min_date,max_date)
+  // {
+  //   if ($('#lastweek').is(':checked') == true){
+  //      $("#min").val(min_date);
+  //      $("#max").val(max_date);
+
+  // } else {
+  //      $("#min").val('');
+  //      $("#max").val('');
+    
+  // }
+  // }
+
 
     $.fn.dataTable.ext.search.push(
         function (settings, searchData, index, rowData, counter) {
+            var min_date;
+            var max_date;
+            if($('#lastweek').is(':checked'))
+            {
+                var dates = $('#lastweek').val().split('~');
+                 min_date = dates[0];
+                console.log('min_date'+min_date);
+                 max_date = dates[1];
+                console.log('max_date'+max_date);  
+            }
+            else
+            {
+               min_date = '';
+               max_date = '';
+            }
 
+            //var date = new Date(searchData[3]);
             var offices = $('input:checkbox[name="keyword"]:checked').map(function () {
                 return this.value;
             }).get();
-
-
-               console.log(offices);
-               console.log('r&d')
-
-
-              if (offices.length === 0) {
+            console.log(offices);
+            console.log('r&d')
+            if (offices.length === 0) {
                 return true;
                 console.log('lenth0')
             }
-
-            if (offices.indexOf(searchData[1])!== -1 || offices.indexOf(searchData[4])!== -1 || offices.indexOf(searchData[3])!== -1) {
+            if (offices.indexOf(searchData[1])!== -1 || offices.indexOf(searchData[4])!== -1 || offices.indexOf(searchData[3])!== -1||( min_date === null && max_date === null ) ||
+            ( min_date === null && searchData[3] <= max_date ) ||
+            ( min_date <= searchData[3]   && max_date === null )||(searchData[3]>=min_date && searchData[3] <= max_date)) {
                 console.log('lenth1')
-
                 return true;
             }
             console.log('shobar')
-
-
             return false;
         }
         );
-
     var table = $('#example').DataTable({
         "ordering": false,
         "bPaginate": false,
         "bLengthChange": false,
         "bAutoWidth": false
     });
-
-
     $('input:checkbox').on('change', function () {
         table.draw();
-       console.log('draw');
-
+        console.log('draw');
     });
     $("input[type='checkbox']").on('change',function () {
       var result = table .$('tr', {"filter":"applied"}).length;
       $('.records_count').html('Number of Records :'+result)
   });
-  //   $('#php').on('change',function () {
-  //     var result = table .$('tr', {"filter":"applied"}).length;
-  //     $('.records_count').html('Number of Records :'+result)
-  // });
-  //   $('#vue').on('change',function () {
-  //     var result = table .$('tr', {"filter":"applied"}).length;
-  //     $('.records_count').html('Number of Records :'+result)
-  // });
-
-   //      $('#received').on('change',function () {
-   //     var result = table .$('tr', {"filter":"applied"}).length;
-   //     $('.received').html('Number of Records :'+result)
-   // });
-
-});
-
 
 </script>
 </body>
