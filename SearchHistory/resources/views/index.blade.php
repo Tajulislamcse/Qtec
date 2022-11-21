@@ -43,11 +43,11 @@
         </div>
         <div class="col-md-4">
             <div class="form-group">
-                <label class="custom-control-label">Min Date</label>
+                <label class="custom-control-label">From Date</label>
                 <input type="text" id="from_date" name="from_date">
                 <br>
                 <br>
-                <label class="custom-control-label">Max Date</label>
+                <label class="custom-control-label">To Date</label>
 
                 <input type="text" id="to_date" name="to_date">
             </div>
