@@ -1,198 +1,163 @@
-<!DOCTYPE html>
+
 <html>
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title></title>
-    <link rel="stylesheet" type="text/css" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Laravel 5.8 - Individual Column Search in Datatables using Ajax</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" /> 
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.10.12/css/dataTables.bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/datetime/1.2.0/css/dataTables.dateTime.min.css"/>
+
 </head>
 <body>
-   <div class="container-fluid">
-    <div class="col-sm-12">
-        <div class="card">
-            <table border="0" cellpadding="5">
- 
-
-                <!--keyword search-->
-                <input type="checkbox"  id="laravel" name="keyword" value="laravel">
+  <div class="container">    
+     <br />
+     <br />
+     <br />
+     <div class="row">
+        <div class="col-md-4">
+                            <!--keyword search-->
+              <div class="form-group">
+                <input type="checkbox"  id="laravel" name="keywords" value="laravel">
                 <label class="custom-control-label" for="laravel">laravel</label>
-                <input type="checkbox" id="php" name="keyword" value="php">
+                <input type="checkbox" id="php" name="keywords" value="php">
                 <label class="custom-control-label" for="laravel">php</label>
-                <input type="checkbox" id="vue" name="keyword" value="vue">
+                <input type="checkbox" id="vue" name="keywords" value="vue">
                 <label class="custom-control-label" for="vue">vue</label>
+            </div>
                 <!--/keyword search-->
 
-                <!--user search-->
-                <br>
-                <br>
-                <input type="checkbox" id="tajul" name="keyword" value="tajul">
+
+        </div>
+        <div class="col-md-4">
+                            <!--user search-->
+            <div class="form-group">
+                <input type="checkbox" id="tajul" name="users" value="tajul">
                 <label class="custom-control-label" for="tajul">tajul</label>
-                <input type="checkbox" id="rakib" name="keyword" value="rakib">
+                <input type="checkbox" id="rakib" name="users" value="rakib">
                 <label class="custom-control-label" for="rakib">rakib</label>
-                <input type="checkbox" id="harun" name="keyword" value="harun">
+                <input type="checkbox" id="harun" name="users" value="harun">
                 <label class="custom-control-label" for="harun">harun</label>
                 <!--/user search-->
-
-                <!--date search-->
-                @php
-                $yesterday = new DateTime('yesterday'); 
-                $yesterday = $yesterday->format('d-m-Y');
-                $lastweek = DB::select("SELECT date FROM searches
-                       WHERE YEARWEEK(date) = YEARWEEK(NOW() - INTERVAL 1 WEEK)");
-                $dates = [];
-                foreach($lastweek as $data)
-                {
-                   $dates[] = date('d-m-Y',strtotime($data->date));
-                }
-                $min_date = min($dates);
-                $max_date = max($dates);
-
-
-                @endphp
-                <br>
-                <br>
-               
-                <input type="checkbox"  name="keyword" value="{{$yesterday}}">
-                <label class="custom-control-label" for="yesterday">Yesterday</label>
-                <input type="checkbox" id="lastweek" name="keyword" value ="{{$min_date.'~'.$max_date}}">
-                <!-- <label class="custom-control-label" for="rakib">Last Week</label> -->
-
-                <label class="custom-control-label" for="rakib">Last Week</label>
-                &nbsp;
-                <input type="checkbox"  name="keyword" value="">
-
-                <label class="custom-control-label" for="rakib">Last Month</label>
-                <br>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
                 <label class="custom-control-label">Min Date</label>
-                <input type="text" id="min" name="min">
+                <input type="text" id="from_date" name="from_date">
                 <br>
                 <br>
                 <label class="custom-control-label">Max Date</label>
 
-                <input type="text" id="max" name="max">
+                <input type="text" id="to_date" name="to_date">
+            </div>
 
-        
+            <div class="form-group" align="center">
+                <button type="button" name="filter" id="filter" class="btn btn-info">Search</button>
 
-    <!--                <tr>
-                    <td>Minimum date:</td>
-                    <td><input type="text" id="min" name="min"></td>
-                </tr>
-                <tr>
-                    <td>Maximum date:</td>
-                    <td><input type="text" id="max" name="max"></td>
-                </tr> -->
-                <!--/date search-->
-                <h1 class="records_count"></h1>
-
-            </table>
-
-            <div class="table-responsive">
-                <div>
-                    <table id="example" class="display" style="width:100%">
-                        <thead>
-                            <tr>
-                                <th>SL</th>
-                                <th>Keyword</th>
-                                <th>Result</th>
-                                <th>Date</th>
-                                <th>User</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-
-                            @foreach($searches as $search)
-                            <tr>
-                                <td>{{$loop->iteration}}</td>
-                                <td>{{$search->keyword ?? ''}}</td>
-                                <td>{{$search->result ?? ''}}</td>
-                                <td>{{isset($search->date) ? date('d-m-Y',strtotime($search->date)) : ''}}</td>
-                                <td>{{$search->user ?? '' }}</td>
-                                
-                            </tr>
-
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-                <div class="pagination">
-                </div>
+                <button type="button" name="reset" id="reset" class="btn btn-default">Reset</button>
             </div>
         </div>
     </div>
+    <br />
+    <div class="table-responsive">
+        <table id="customer_data" class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Keyword</th>
+                    <th>Result</th>
+                    <th>Date</th>
+                    <th>User</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+    <br />
+    <br />
 </div>
+<script src="https://cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.12/js/dataTables.bootstrap.min.js"></script> 
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.2/moment.min.js"></script>
+<script src="https://cdn.datatables.net/datetime/1.2.0/js/dataTables.dateTime.min.js"></script>
+<script>
+    $(document).ready(function(){
+          var  minDate = new DateTime($('#from_date'),
+            {format: 'DD-MM-YYYY'}) ;
+           var maxDate = new DateTime($('#to_date'),
+            {format: 'DD-MM-YYYY'}) ;
 
-<script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.3.min.js"></script>
-<script src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.10.4/jquery.dataTables.min.js"></script>
-<script type="text/javascript">
- 
+        fill_datatable();
 
-  // function sendDates(min_date,max_date)
-  // {
-  //   if ($('#lastweek').is(':checked') == true){
-  //      $("#min").val(min_date);
-  //      $("#max").val(max_date);
+        function fill_datatable(keywords = '',users = '',from_date = '', to_date = '')
+        {
+            var dataTable = $('#customer_data').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax:{
+                    url: "{{ route('searches.index') }}",
+                    data:{keywords:keywords,users:users,from_date:from_date, to_date:to_date}
+                },
+                columns: [
+                {
+                    data:'id',
+                    name:'id'
+                },
+                {
+                    data:'keyword',
+                    name:'keyword'
+                },
+                {
+                    data:'result',
+                    name:'result'
+                },
+                {
+                    data:'date',
+                    render: function(data)
+                    {
+                      return moment(data).format('DD-MM-YYYY')
+                    },
+                    name:'date'
+                },
+                {
+                    data:'user',
+                    name:'user'
+                },
 
-  // } else {
-  //      $("#min").val('');
-  //      $("#max").val('');
-    
-  // }
-  // }
-
-
-    $.fn.dataTable.ext.search.push(
-        function (settings, searchData, index, rowData, counter) {
-            var min_date;
-            var max_date;
-            if($('#lastweek').is(':checked'))
-            {
-                var dates = $('#lastweek').val().split('~');
-                 min_date = dates[0];
-                console.log('min_date'+min_date);
-                 max_date = dates[1];
-                console.log('max_date'+max_date);  
-            }
-            else
-            {
-               min_date = '';
-               max_date = '';
-            }
-
-            //var date = new Date(searchData[3]);
-            var offices = $('input:checkbox[name="keyword"]:checked').map(function () {
-                return this.value;
-            }).get();
-            console.log(offices);
-            console.log('r&d')
-            if (offices.length === 0) {
-                return true;
-                console.log('lenth0')
-            }
-            if (offices.indexOf(searchData[1])!== -1 || offices.indexOf(searchData[4])!== -1 || offices.indexOf(searchData[3])!== -1||( min_date === null && max_date === null ) ||
-            ( min_date === null && searchData[3] <= max_date ) ||
-            ( min_date <= searchData[3]   && max_date === null )||(searchData[3]>=min_date && searchData[3] <= max_date)) {
-                console.log('lenth1')
-                return true;
-            }
-            console.log('shobar')
-            return false;
+                ]
+            });
         }
-        );
-    var table = $('#example').DataTable({
-        "ordering": false,
-        "bPaginate": false,
-        "bLengthChange": false,
-        "bAutoWidth": false
-    });
-    $('input:checkbox').on('change', function () {
-        table.draw();
-        console.log('draw');
-    });
-    $("input[type='checkbox']").on('change',function () {
-      var result = table .$('tr', {"filter":"applied"}).length;
-      $('.records_count').html('Number of Records :'+result)
-  });
 
+        $('#filter').click(function(){
+            var users = $('input:checkbox[name="users"]:checked').map(function () {
+                    return this.value;
+                }).get()
+            var keywords = $('input:checkbox[name="keywords"]:checked').map(function () {
+                    return this.value;
+                }).get()
+
+            var from_date = minDate.val()!=null  ? moment(minDate.val()).format('YYYY-MM-DD') : ''
+            console.log(from_date)
+            var to_date = maxDate.val()!=null ? moment(maxDate.val()).format('YYYY-MM-DD') : ''
+            
+               // console.log(from_date+' '+to_date)
+               console.log(from_date)
+               
+                $('#customer_data').DataTable().destroy();
+                fill_datatable(keywords,users,from_date, to_date);
+
+        });
+
+
+        $('#reset').click(function(){
+            $('#from_date').val('');
+            $('#to_date').val('');
+            $('#customer_data').DataTable().destroy();
+            fill_datatable();
+        });
+
+    });
 </script>
 </body>
 </html>

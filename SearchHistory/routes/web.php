@@ -15,11 +15,6 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return "hello world";
+    return view('welcome');
 });
 Route::resource('searches','App\Http\Controllers\SearchController');
-Route::get('testb',function()
-{
-   dd('tareq');
-});
-
