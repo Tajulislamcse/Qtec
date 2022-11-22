@@ -18,7 +18,7 @@ class CreateSearchesTable extends Migration
             $table->string('keyword');
             $table->date('date');
             $table->string('result');
-            $table->string('user');
+            $table->integer('user_id');
             $table->timestamps();
         });
     }
