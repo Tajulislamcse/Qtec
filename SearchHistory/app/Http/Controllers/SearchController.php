@@ -37,7 +37,7 @@ class SearchController extends Controller
 				}
 				if(isset($users))
 				{
-					$searches =$table->whereIn('user',$users)->get();
+					$searches =$table->whereIn('u.name',$users)->get();
 				}
 				if(isset($from_date) ||isset($to_date))
 				{
